@@ -7,8 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-
 @Controller
 public class HomeController {
 
@@ -24,7 +22,7 @@ public class HomeController {
     @ResponseBody
     @GetMapping("/start")
     public void start() {
-        System.setProperty("webdriver.chrome.driver", "/Users/adminqian/chromedriver");
+        System.setProperty("webdriver.chrome.driver", "/Users/adminqian/shen/soft/chromeDriver/chromedriver");
 
         ChromeOptions chromeOptions = new ChromeOptions();
 //chromeOptions.addArguments("--headless");
@@ -33,7 +31,6 @@ public class HomeController {
         driver = new ChromeDriver(chromeOptions);
         driver.get("https://photo.weibo.com/upload/index?prel=p5_1#3500590076519405");
     }
-
 
     @ResponseBody
     @GetMapping("browser/go")
@@ -52,7 +49,7 @@ public class HomeController {
             element.click();
 
         // 选择本地文件
-        file = "/Users/adminqian/my/mzitu/9d52c073gw1egv717pw8uj20jg0t6tcv.jpg";
+        file = "/Users/adminqian/my/mzitu/9d52c073gw1elar8gic2vj20g42qp49v.jpg";
         driver.findElementByName("pic1").sendKeys(file);
 
         element = findElement("a", "action-type", "comm_upload");
