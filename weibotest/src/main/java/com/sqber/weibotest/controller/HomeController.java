@@ -1,8 +1,10 @@
 package com.sqber.weibotest.controller;
 
+import com.sqber.weibotest.config.ChromeDriverConf;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,6 +15,9 @@ public class HomeController {
 
     private ChromeDriver driver;
 
+    @Autowired
+    private ChromeDriverConf chromeDriverConf;
+
     @ResponseBody
     @GetMapping("/")
     public String index() {
@@ -21,8 +26,8 @@ public class HomeController {
 
     @ResponseBody
     @GetMapping("/start")
-    public void start() {
-        System.setProperty("webdriver.chrome.driver", "/Users/adminqian/shen/soft/chromeDriver/chromedriver");
+    public String start() {
+        System.setProperty("webdriver.chrome.driver", chromeDriverConf.getPath());
 
         ChromeOptions chromeOptions = new ChromeOptions();
 //chromeOptions.addArguments("--headless");
@@ -30,6 +35,8 @@ public class HomeController {
 
         driver = new ChromeDriver(chromeOptions);
         driver.get("https://photo.weibo.com/upload/index?prel=p5_1#3500590076519405");
+
+        return "chrome driver 初始化成功";
     }
 
     @ResponseBody
