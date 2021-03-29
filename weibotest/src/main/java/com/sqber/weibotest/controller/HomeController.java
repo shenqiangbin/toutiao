@@ -1,6 +1,9 @@
 package com.sqber.weibotest.controller;
 
 import com.sqber.weibotest.config.ChromeDriverConf;
+import com.sqber.weibotest.dao.FileDao;
+import com.sqber.weibotest.model.MyFile;
+import com.sqber.weibotest.service.FileService;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -8,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 public class HomeController {
@@ -17,6 +22,8 @@ public class HomeController {
 
     @Autowired
     private ChromeDriverConf chromeDriverConf;
+    @Autowired
+    private FileService fileService;
 
     @ResponseBody
     @GetMapping("/")
@@ -39,6 +46,26 @@ public class HomeController {
         return "chrome driver 初始化成功";
     }
 
+    /**
+     * 将数据库中待同步的文件同步到微博相册
+     * @return
+     * @throws Exception
+     */
+    @ResponseBody
+    @GetMapping("/browser/db")
+    public String db() throws Exception {
+        List<MyFile> list = fileService.getNeedHandle();
+        for(MyFile item : list){
+            String picId = this.go(item.getServerPath());
+
+            fileService.updateState(item.getId(), MyFile.WeiboSyncState_SUCCESS, "", picId);
+            //String pic = "https://wx4.sinaimg.cn/mw690/" + str + ".jpg";
+            //String pic = "https://wx4.sinaimg.cn/large/8e2ef8f7gy1gp171tmfldj20go0l21kx.jpg";
+            //return pic;
+        }
+        return "ok";
+    }
+
     @ResponseBody
     @GetMapping("browser/go")
     public String go(String file) {
@@ -56,7 +83,7 @@ public class HomeController {
             element.click();
 
         // 选择本地文件
-        file = "/Users/adminqian/my/mzitu/9d52c073gw1elar8gic2vj20g42qp49v.jpg";
+        //file = "/Users/adminqian/my/mzitu/9d52c073gw1elar8gic2vj20g42qp49v.jpg";
         driver.findElementByName("pic1").sendKeys(file);
 
         element = findElement("a", "action-type", "comm_upload");
@@ -81,9 +108,7 @@ public class HomeController {
         System.out.println(result);
         String str = result.substring(result.indexOf("pid\":") + 6, result.indexOf("\",\"pic"));
 
-        //return str;
-        String pic = "https://wx4.sinaimg.cn/mw690/" + str + ".jpg";
-        return pic;
+        return str;
         //System.out.println(pic);
     }
 
