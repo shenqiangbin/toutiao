@@ -7,7 +7,10 @@ import com.sqber.weibotest.service.FileService;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,8 +20,10 @@ import java.util.List;
 @Controller
 public class HomeController {
 
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private ChromeDriver driver;
+    private boolean hasLogin = false;
 
     @Autowired
     private ChromeDriverConf chromeDriverConf;
@@ -46,8 +51,41 @@ public class HomeController {
         return "chrome driver 初始化成功";
     }
 
+    @ResponseBody
+    @GetMapping("/haslogin")
+    public String hasLogin(){
+        this.hasLogin = true;
+        return "ok";
+    }
+
+    @Scheduled(fixedRate = 1000 * 2)
+    public void sync() {
+        log.info("task1 run");
+//        for(int i=0; i< 10; i++){
+//            log.info("task1 count:" + i);
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        try {
+            if (driver == null) {
+                log.info("driver 未初始化");
+            } else if (!hasLogin) {
+                log.info("还未登录");
+            } else {
+                this.db();
+            }
+        } catch (Exception e) {
+            log.error("error:{}", e);
+        }
+        log.info("task1 run end");
+    }
+
     /**
      * 将数据库中待同步的文件同步到微博相册
+     *
      * @return
      * @throws Exception
      */
@@ -55,10 +93,14 @@ public class HomeController {
     @GetMapping("/browser/db")
     public String db() throws Exception {
         List<MyFile> list = fileService.getNeedHandle();
-        for(MyFile item : list){
-            String picId = this.go(item.getServerPath());
+        for (MyFile item : list) {
 
-            fileService.updateState(item.getId(), MyFile.WeiboSyncState_SUCCESS, "", picId);
+            try {
+                String picId = this.go(item.getServerPath());
+                fileService.updateState(item.getId(), MyFile.WeiboSyncState_SUCCESS, "成功", picId);
+            } catch (Exception e) {
+                fileService.updateState(item.getId(), MyFile.WeiboSyncState_FAIL, e.getMessage(), "");
+            }
             //String pic = "https://wx4.sinaimg.cn/mw690/" + str + ".jpg";
             //String pic = "https://wx4.sinaimg.cn/large/8e2ef8f7gy1gp171tmfldj20go0l21kx.jpg";
             //return pic;
