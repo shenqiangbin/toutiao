@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传图片</title>
+</head>
+<body>
+    <h2>上传图片</h2>
+
+    <div id="msg"></div>
+    <form action='/file/upload' enctype='multipart/form-data' method='post' id="fileUpload">
+        <input type="hidden" name="type" value="logo" />
+        <input type='file' id='filename' name='file'/>
+        <input type='button' value='上传' onclick="go()" />
+    </form>
+
+</body>
+
+<!--<script th:src="@{/js/jquery.min.js}"></script>-->
+<script src="/js/jquery.min.js"></script>
+
+<script>
+
+var contextRoot = "/";
+    /*图片上传部分*/
+    var go = function(){
+        var target = document.getElementById("filename");
+        if (target.files && target.files.length != 0) {
+            if (checkFileType(target) && checkFileSize(target)) {
+                var form = document.getElementById("fileUpload");
+                var postData = new FormData(form);
+                $("#msg").html("处理中...");
+                $.ajax({
+                    url: contextRoot + 'file/upload',
+                    type: "POST",
+                    data: postData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if(data.success == 1){
+                            $("#msg").html("上传成功");
+                        }
+                        else{
+                            showError("上传失败");
+                            $("#msg").html("");
+                        }
+
+                    },
+                    error: function () {
+                        showError("上传失败！");
+                        $("#msg").html("");
+                    }
+                });
+            }
+        }
+
+    }
+
+    function checkFileType(target) {
+        var fileType = getFileType(target);
+        var fileTypes = [".jpg", ".png"];
+        if (fileTypes.indexOf(fileType) == -1) {
+            showError("文件类型不对,请上传 .jpg 或 .png 类型的文件");
+            return false;
+        }
+        return true;
+    }
+
+    function getFileType(target) {
+
+        if (isSomeIE()) {
+            var filePath = target.value;
+            var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+            var file = fileSystem.GetFile(filePath);
+            return file.Type;
+        } else {
+            var filename = target.files[0].name;
+            return filename.substr(filename.lastIndexOf(".")).toLowerCase();
+        }
+    }
+
+    function isSomeIE() {
+        var isIE = /msie/i.test(navigator.userAgent) && !window.opera;
+        return isIE && (navigator.userAgent.toLowerCase().match(/msie [\d.]+;/gi) + "").replace(/[^0-9.]/ig, "") != '10.0';
+    }
+
+    function checkFileSize(target) {
+        var fileSize = getFileSize(target);
+        if (fileSize > 5) {
+            showError("文件大小请小于5M");
+            return false;
+        }
+
+        return true;
+    }
+
+    function getFileSize(target) {
+        var fileSize = 0;
+
+        if (isSomeIE()) {
+            var filePath = target.value;
+            var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+            var file = fileSystem.GetFile(filePath);
+            fileSize = file.Size;
+        } else {
+            fileSize = target.files[0].size;
+        }
+
+        return fileSize / 1024 / 1024;
+    }
+
+    function showError(msg){
+        alert(msg);
+    }
+
+</script>
+</html>

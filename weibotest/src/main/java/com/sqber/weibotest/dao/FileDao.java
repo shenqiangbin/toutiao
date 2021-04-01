@@ -1,8 +1,10 @@
 package com.sqber.weibotest.dao;
 
 import com.sqber.weibotest.db.DBHelper;
+import com.sqber.weibotest.db.PagedResponse;
 import com.sqber.weibotest.db.ParamsHelper;
 import com.sqber.weibotest.model.MyFile;
+import com.sqber.weibotest.query.person.FileQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,8 +43,16 @@ public class FileDao {
         return dbHelper.simpleQuery(sql, null, MyFile.class);
     }
 
+    public PagedResponse<MyFile> get(FileQuery query) throws Exception {
+        String sql = "select * from file order by id desc";
+        String sumSql = "select count(*) from file";
+        return dbHelper.queryPage(sql, sumSql, query.getCurrentPage(), query.getPageSize(), MyFile.class);
+    }
+
     public void updateState(Long id, Integer state, String info, String picId) throws SQLException {
         String sql = "update file set weiboSyncState = ?,weiboSyncMsg=?,weiboId=? where id = ?";
         dbHelper.update(sql, new Object[]{state, info, picId, id});
     }
+
+
 }

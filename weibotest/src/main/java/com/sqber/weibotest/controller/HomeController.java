@@ -177,11 +177,10 @@ public class HomeController {
     }
 
     @GetMapping("/weibo/pic")
-    public void getPic(HttpServletResponse response) throws IOException {
+    public void getPic(String url, HttpServletResponse response) throws IOException {
         // 盗链被屏蔽，则只能服务器先从对方那获取文件，然后在返回给浏览器。
         // 先从微博获取，获取失败，则从本地获取
 
-        String url = "https://wx4.sinaimg.cn/large/8e2ef8f7gy1goytdh26k2j219m0n8786.jpg";
         BufferedImage bufferedImage = ImageIO.read(new URL(url));
         ImageIO.write(bufferedImage, "jpg", response.getOutputStream());
     }

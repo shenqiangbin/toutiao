@@ -1,7 +1,9 @@
 package com.sqber.weibotest.service;
 
 import com.sqber.weibotest.dao.FileDao;
+import com.sqber.weibotest.db.PagedResponse;
 import com.sqber.weibotest.model.MyFile;
+import com.sqber.weibotest.query.person.FileQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,10 @@ public class FileService {
     // 查
     public List<MyFile> getNeedHandle() throws Exception {
         return fileDao.getNeedHandle();
+    }
+
+    public PagedResponse<MyFile> get(FileQuery query) throws Exception {
+        return fileDao.get(query);
     }
 
 

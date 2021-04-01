@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图片列表</title>
+    <style>
+        p {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<h2>图片列表</h2>
+
+<div id="app">
+    <!--{{list}}-->
+    <div v-for="item in list" style="border:1px solid red;margin-bottom:10px;">
+        <!--{{item}}-->
+        <p>{{item.name}}</p>
+        <p>{{item.serverPath}}</p>
+        <br />
+        <p>{{item.weiboSyncState}}</p>
+        <p style="display: none;">{{item.weiboSyncMsg}}</p>
+        <p>
+            {{"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
+            <a target="_blank" :href='"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
+
+        </p>
+        <p>
+            {{"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
+            <a target="_blank" :href='"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
+        </p>
+    </div>
+</div>
+
+</body>
+
+<!--<script th:src="@{/js/jquery.min.js}"></script>-->
+<script src="/js/jquery.min.js"></script>
+<script src="/js/vue.js"></script>
+
+
+<script>
+
+    var contextRoot = "/";
+    var query = function () {
+        $.ajax({
+            url: contextRoot + 'file/getlist',
+            type: "GET",
+            data: {},
+            success: function (rtn) {
+                if (rtn.code == 200) {
+                    app.list = rtn.data.list;
+                }
+                else {
+                    showError("上传失败");
+                    $("#msg").html("");
+                }
+            },
+            error: function () {
+                showError("失败！");
+            }
+        });
+    }
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            pageModel: [],
+            searchName: '', /*查询参数：用户单位名称*/
+            currentPage: 1,
+            selectedItems: [],
+            list: []
+        },
+        methods: {
+            query: query,
+            handleSizeChange(val) {
+
+            },
+            handleCurrentChange(val) {
+                app.currentPage = val;
+                app.loadData();
+            }
+        }
+    })
+
+    app.query()
+
+    function showError(msg) {
+        alert(msg);
+    }
+
+</script>
+</html>

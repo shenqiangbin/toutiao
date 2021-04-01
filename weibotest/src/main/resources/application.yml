@@ -1,6 +1,9 @@
 chrome-driver:
   path: /Users/adminqian/shen/soft/chromeDriver/chromedriver
 
+fileupload:
+  savePath: /Users/adminqian/git/toutiao/weibotest/upload/
+
 spring:
   datasource:
     mysql:

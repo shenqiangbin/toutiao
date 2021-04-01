@@ -10,6 +10,8 @@ public class MyFile {
     private String name;
     private String serverPath;
     private Integer weiboSyncState;
+    private String weiboSyncMsg;
+    private String weiboId;
 
     public Long getId() {
         return id;
@@ -41,5 +43,21 @@ public class MyFile {
 
     public void setWeiboSyncState(Integer weiboSyncState) {
         this.weiboSyncState = weiboSyncState;
+    }
+
+    public String getWeiboSyncMsg() {
+        return weiboSyncMsg;
+    }
+
+    public void setWeiboSyncMsg(String weiboSyncMsg) {
+        this.weiboSyncMsg = weiboSyncMsg;
+    }
+
+    public String getWeiboId() {
+        return weiboId;
+    }
+
+    public void setWeiboId(String weiboId) {
+        this.weiboId = weiboId;
     }
 }

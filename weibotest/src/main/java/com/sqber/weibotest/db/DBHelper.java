@@ -511,7 +511,7 @@ public class DBHelper {
         return result;
     }
 
-    public <T> PagedResponse<T> queryPage(String sql, String sumSql, int pageIndex, int pageSize, Class<T> type) throws SQLException, IllegalAccessException, NoSuchFieldException, InstantiationException {
+    public <T> PagedResponse<T> queryPage(String sql, String sumSql, int pageIndex, int pageSize, Class<T> type) throws Exception {
         PagedResponse<T> result = new PagedResponse<>();
         result.setPageSize(pageSize);
         result.setCurrentPage(pageIndex);
