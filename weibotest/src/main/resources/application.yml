@@ -1,13 +1,5 @@
-chrome-driver:
-  path: /Users/adminqian/shen/soft/chromeDriver/chromedriver
-
-fileupload:
-  savePath: /Users/adminqian/git/toutiao/weibotest/upload/
-
 spring:
-  datasource:
-    mysql:
-      JdbcUrl: jdbc:mysql://127.0.0.1:3306/lab?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true       #url: bolt://192.168.52.64:7687
-      DriverClassName: com.mysql.cj.jdbc.Driver
-      Username: root
-      Password: 123456
+  profiles:
+    #active: dev
+    active: rele
+

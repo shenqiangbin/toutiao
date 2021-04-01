@@ -1,0 +1,16 @@
+server:
+  port: 8007
+
+chrome-driver:
+  path: c:/chromedriver/chromedriver.exe
+
+fileupload:
+  savePath: c:/weibotest/upload/
+
+spring:
+  datasource:
+    mysql:
+      JdbcUrl: jdbc:mysql://127.0.0.1:3306/lab?useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true       #url: bolt://192.168.52.64:7687
+      DriverClassName: com.mysql.cj.jdbc.Driver
+      Username: root
+      Password: 123456
