@@ -15,6 +15,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 @Controller
@@ -36,6 +42,7 @@ public class HomeController {
         return "启动成功了";
     }
 
+
     @ResponseBody
     @GetMapping("/start")
     public String start() {
@@ -53,7 +60,7 @@ public class HomeController {
 
     @ResponseBody
     @GetMapping("/haslogin")
-    public String hasLogin(){
+    public String hasLogin() {
         this.hasLogin = true;
         return "ok";
     }
@@ -169,4 +176,13 @@ public class HomeController {
         return null;
     }
 
+    @GetMapping("/weibo/pic")
+    public void getPic(HttpServletResponse response) throws IOException {
+        // 盗链被屏蔽，则只能服务器先从对方那获取文件，然后在返回给浏览器。
+        // 先从微博获取，获取失败，则从本地获取
+
+        String url = "https://wx4.sinaimg.cn/large/8e2ef8f7gy1goytdh26k2j219m0n8786.jpg";
+        BufferedImage bufferedImage = ImageIO.read(new URL(url));
+        ImageIO.write(bufferedImage, "jpg", response.getOutputStream());
+    }
 }
