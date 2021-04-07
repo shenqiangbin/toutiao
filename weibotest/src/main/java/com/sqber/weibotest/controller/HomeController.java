@@ -82,6 +82,7 @@ public class HomeController {
             } else if (!hasLogin) {
                 log.info("还未登录");
             } else {
+                driver.get("http://www.baidu.com");
                 this.db();
             }
         } catch (Exception e) {
