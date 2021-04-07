@@ -195,6 +195,7 @@ public class HomeController {
         String[] arr = new String[]{
                 "http://blog.sqber.com/",
                 "http://www.sqber.com/",
+                "http://www.sqber.com:8007/",
                 "http://localhost:8080/"
         };
         String refer = request.getHeader("Referer");
