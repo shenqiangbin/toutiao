@@ -178,11 +178,33 @@ public class HomeController {
     }
 
     @GetMapping("/weibo/pic")
-    public void getPic(String url, HttpServletResponse response) throws IOException {
+    public void getPic(String url, HttpServletResponse response, HttpServletRequest request) throws IOException {
         // 盗链被屏蔽，则只能服务器先从对方那获取文件，然后在返回给浏览器。
         // 先从微博获取，获取失败，则从本地获取
 
+        if (!canAccess(request)) {
+            response.getWriter().write("can not access");
+            return;
+        }
+
         BufferedImage bufferedImage = ImageIO.read(new URL(url));
         ImageIO.write(bufferedImage, "jpg", response.getOutputStream());
+    }
+
+    private boolean canAccess(HttpServletRequest request) {
+        String[] arr = new String[]{
+                "http://blog.sqber.com/",
+                "http://www.sqber.com/",
+                "http://localhost:8080/"
+        };
+        String refer = request.getHeader("Referer");
+        if (refer == null)
+            return false;
+
+        for (int i = 0; i < arr.length; i++) {
+            if (refer.startsWith(arr[i]))
+                return true;
+        }
+        return false;
     }
 }
