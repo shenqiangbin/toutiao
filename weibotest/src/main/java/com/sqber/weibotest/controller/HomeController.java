@@ -1,9 +1,17 @@
 package com.sqber.weibotest.controller;
 
+import ch.qos.logback.core.util.FileUtil;
+import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sqber.weibotest.base.FileHelper;
 import com.sqber.weibotest.config.ChromeDriverConf;
+import com.sqber.weibotest.config.FileUploadConfig;
 import com.sqber.weibotest.dao.FileDao;
+import com.sqber.weibotest.model.MyCookie;
 import com.sqber.weibotest.model.MyFile;
 import com.sqber.weibotest.service.FileService;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -22,6 +30,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class HomeController {
@@ -35,17 +45,21 @@ public class HomeController {
     private ChromeDriverConf chromeDriverConf;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private FileUploadConfig fileUploadConfig;
+
+    private int num = 1;
 
     @ResponseBody
     @GetMapping("/")
     public String index() {
-        return "启动成功了";
+        return "weibo application";
     }
 
 
     @ResponseBody
     @GetMapping("/start")
-    public String start() {
+    public String start() throws Exception {
         System.setProperty("webdriver.chrome.driver", chromeDriverConf.getPath());
 
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -53,21 +67,56 @@ public class HomeController {
 //chromeOptions.addArguments("--window-size=1280,768");
 
         driver = new ChromeDriver(chromeOptions);
+
+        driver.manage().timeouts().pageLoadTimeout(20, TimeUnit.SECONDS);
+        //WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
         driver.get("https://photo.weibo.com/upload/index?prel=p5_1#3500590076519405");
+
+        loadCookie();
 
         return "chrome driver 初始化成功";
     }
 
+    private void loadCookie() throws Exception {
+        String newFile = fileUploadConfig.getSavePath() + "/cookie.txt";
+        String str = FileHelper.readTxtFile(newFile);
+
+        List<MyCookie> cookieSet = JSON.parseArray(str, MyCookie.class);
+        cookieSet.forEach(m -> driver.manage().addCookie(m.toSeleCookie()));
+    }
+
     @ResponseBody
     @GetMapping("/haslogin")
-    public String hasLogin() {
+    public String hasLogin() throws Exception {
         this.hasLogin = true;
+        Set<Cookie> cookieSet = driver.manage().getCookies();
+        String str = JSON.toJSONString(cookieSet);
+
+        String newFile = fileUploadConfig.getSavePath() + "/cookie.txt";
+        FileHelper.writeTxtFile(str, newFile, false, false);
         return "ok";
     }
 
+    @ResponseBody
+    @GetMapping("/readtest")
+    public String read() throws Exception {
+//        this.hasLogin = true;
+//        Set<Cookie> cookieSet = driver.manage().getCookies();
+//        String str = JSON.toJSONString(cookieSet);
+
+        String newFile = fileUploadConfig.getSavePath() + "/cookie.txt";
+        String str = FileHelper.readTxtFile(newFile);
+
+        List<MyCookie> cookieSet = JSON.parseArray(str, MyCookie.class);
+        cookieSet.forEach(m -> driver.manage().addCookie(m.toSeleCookie()));
+
+        return str;
+    }
+
     @Scheduled(fixedRate = 1000 * 2)
-    public void sync() {
-        log.info("task1 run");
+    public void sync() throws Exception {
+        //log.info("task1 run");
 //        for(int i=0; i< 10; i++){
 //            log.info("task1 count:" + i);
 //            try {
@@ -79,16 +128,23 @@ public class HomeController {
         try {
             if (driver == null) {
                 log.info("driver 未初始化");
-            } else if (!hasLogin) {
-                log.info("还未登录");
-            } else {
-                driver.get("http://www.baidu.com");
+            }
+//            else if (!hasLogin) {
+//                log.info("还未登录");
+//            }
+            else {
+                if (num++ >= 30) {
+                    driver.get("https://weibo.com/");
+                    num = 1;
+                }
                 this.db();
             }
         } catch (Exception e) {
             log.error("error:{}", e);
+            driver.close();
+            this.start();
         }
-        log.info("task1 run end");
+        //log.info("task1 run end");
     }
 
     /**
