@@ -4,6 +4,10 @@ chrome-driver:
 fileupload:
   savePath: /Users/adminqian/git/toutiao/weibotest/upload/
 
+weibo:
+  name: dianyitongxiao@sina.com
+  pwd: xxxx
+
 spring:
   datasource:
     mysql:

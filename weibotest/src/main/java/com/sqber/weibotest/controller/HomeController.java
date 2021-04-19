@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sqber.weibotest.base.FileHelper;
 import com.sqber.weibotest.config.ChromeDriverConf;
 import com.sqber.weibotest.config.FileUploadConfig;
+import com.sqber.weibotest.config.WeiboConf;
 import com.sqber.weibotest.dao.FileDao;
 import com.sqber.weibotest.model.MyCookie;
 import com.sqber.weibotest.model.MyFile;
 import com.sqber.weibotest.service.FileService;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -47,6 +49,8 @@ public class HomeController {
     private FileService fileService;
     @Autowired
     private FileUploadConfig fileUploadConfig;
+    @Autowired
+    private WeiboConf weiboConf;
 
     private int num = 1;
 
@@ -75,7 +79,9 @@ public class HomeController {
 
         loadCookie();
 
-        return "chrome driver 初始化成功";
+        String loginMsg = checkLogin();
+
+        return "chrome driver 初始化成功 " + loginMsg;
     }
 
     private void loadCookie() throws Exception {
@@ -84,6 +90,73 @@ public class HomeController {
 
         List<MyCookie> cookieSet = JSON.parseArray(str, MyCookie.class);
         cookieSet.forEach(m -> driver.manage().addCookie(m.toSeleCookie()));
+    }
+
+    @ResponseBody
+    @GetMapping("checklogin")
+    public String checklogin() throws Exception {
+        return this.checkLogin();
+    }
+
+    private String checkLogin() throws Exception {
+        driver.get("https://weibo.com");
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            WebElement ele = driver.findElementById("pl_login_form");
+            startLogin();
+            return "not login （在手机微博中确认登录）";
+
+        } catch (NoSuchElementException ex) {
+            this.hasLogin();
+            return "has login";
+        }
+    }
+
+    private void startLogin() {
+        String script = "document.getElementById('loginname').value = '$name';\n" +
+                "document.getElementsByName('password')[0].value = '$pwd';\n" +
+                "document.getElementsByClassName('W_btn_a')[0].click()\n";
+        script = script.replace("$name", weiboConf.getName());
+        script = script.replace("$pwd", weiboConf.getPwd());
+        driver.executeScript(script);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String script1 = "document.getElementById('dmCheck').click()";
+        driver.executeScript(script1);
+
+        //String script2 = "document.getElementById('send_dm_btn').click()";
+        WebElement ele = driver.findElementById("send_dm_btn");
+        if (ele == null) {
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // try again
+
+            script1 = "document.getElementById('dmCheck').click()";
+            driver.executeScript(script1);
+
+            ele = driver.findElementById("send_dm_btn");
+            if (ele != null)
+                ele.click();
+
+        } else {
+            ele.click();
+        }
     }
 
     @ResponseBody
@@ -97,6 +170,7 @@ public class HomeController {
         FileHelper.writeTxtFile(str, newFile, false, false);
         return "ok";
     }
+
 
     @ResponseBody
     @GetMapping("/readtest")
@@ -128,11 +202,9 @@ public class HomeController {
         try {
             if (driver == null) {
                 log.info("driver 未初始化");
-            }
-//            else if (!hasLogin) {
-//                log.info("还未登录");
-//            }
-            else {
+            } else if (!hasLogin) {
+                log.info("还未登录");
+            } else {
                 if (num++ >= 30) {
                     driver.get("https://weibo.com/");
                     num = 1;

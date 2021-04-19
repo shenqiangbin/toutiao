@@ -32,12 +32,12 @@
         <br />
         <p>{{item.weiboSyncState}}</p>
         <p style="display: none;">{{item.weiboSyncMsg}}</p>
-        <p>
+        <p v-show="item.weiboId">
             {{"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
+            （or tva1.sinaimg.cn）
             <a target="_blank" :href='"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
-
         </p>
-        <p>
+        <p v-show="item.weiboId">
             {{"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
             <a target="_blank" :href='"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
         </p>
