@@ -1,19 +1,19 @@
 package com.sqber.weibotest.db;
 
+import com.sqber.weibotest.base.DateUtil;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.text.ParseException;
+import java.util.*;
 
 public class ResultSetHelper {
 
     public static <T> List<T> toList(ResultSet resultSet, Class<T> type) throws SQLException, InstantiationException,
-            IllegalAccessException, NoSuchFieldException, SecurityException {
+            IllegalAccessException, NoSuchFieldException, SecurityException, ParseException {
         List<T> list = new ArrayList<T>();
 
         if (resultSet != null) {
@@ -42,6 +42,11 @@ public class ResultSetHelper {
                                     field.set(instance, Double.parseDouble(val.toString()));
                             } else if (field.getType() == String.class) {
                                 field.set(instance, resultSet.getString(i));
+                            } else if (field.getType() == Date.class) {
+                                // sqlite 的需要这样转换，mysql 的不会处理也是可以的。
+                                field.set(instance, DateUtil.parse(val.toString()));
+                                //field.set(instance, resultSet.getTimestamp(i, Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"))));
+                                //field.set(instance, val);
                             } else {
                                 field.set(instance, val);
                             }

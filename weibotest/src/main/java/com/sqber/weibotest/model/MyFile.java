@@ -1,5 +1,7 @@
 package com.sqber.weibotest.model;
 
+import java.util.Date;
+
 public class MyFile {
 
     public static final Integer WeiboSyncState_NOHand = 0;
@@ -12,6 +14,15 @@ public class MyFile {
     private Integer weiboSyncState;
     private String weiboSyncMsg;
     private String weiboId;
+    private Date createTime;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public Long getId() {
         return id;

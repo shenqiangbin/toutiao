@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 chrome-driver:
   path: /Users/adminqian/shen/soft/chromeDriver/chromedriver
 
@@ -15,3 +18,8 @@ spring:
       DriverClassName: com.mysql.cj.jdbc.Driver
       Username: root
       Password: 123456
+    sqlite:
+      JdbcUrl: jdbc:sqlite:/Users/adminqian/Desktop/tmp/blog/blog.db3?date_string_format=yyyy-MM-dd HH:mm:ss
+      DriverClassName: org.sqlite.JDBC
+      Username:
+      Password:
