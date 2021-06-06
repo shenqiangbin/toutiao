@@ -54,10 +54,9 @@ public class HomeController {
 
     private int num = 1;
 
-    @ResponseBody
     @GetMapping("/")
     public String index() {
-        return "weibo application";
+        return "/home/index";
     }
 
 
