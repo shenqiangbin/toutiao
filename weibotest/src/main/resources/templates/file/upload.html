@@ -14,6 +14,11 @@
         <input type='button' value='上传' onclick="go()" />
     </form>
 
+    <p>
+        <button id="sync">同步到微博</button>
+        <button id="closeServerBrowser">关闭服务器端浏览器</button>
+    </p>
+
 </body>
 
 <!--<script th:src="@{/js/jquery.min.js}"></script>-->
@@ -21,7 +26,36 @@
 
 <script>
 
-var contextRoot = "/";
+    var contextRoot = "/";
+
+    $("#sync").click(function () {
+        $.ajax({
+            url: contextRoot + 'browser/db',
+            type: "GET",
+            success: function (data) {
+                $("#msg").html(data);
+            },
+            error: function () {
+                showError("失败！");
+                $("#msg").html("");
+            }
+        });
+    });
+
+    $("#closeServerBrowser").click(function () {
+        $.ajax({
+            url: contextRoot + 'close',
+            type: "GET",
+            success: function (data) {
+                $("#msg").html(data);
+            },
+            error: function () {
+                showError("失败！");
+                $("#msg").html("");
+            }
+        });
+    });
+
     /*图片上传部分*/
     var go = function(){
         var target = document.getElementById("filename");

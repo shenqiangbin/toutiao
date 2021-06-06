@@ -5,7 +5,6 @@
     <title>图片列表</title>
     <style>
         p {
-            display: inline-block;
             margin-right: 10px;
         }
         iframe { border:1px solid gray; width:100%; }
@@ -14,13 +13,9 @@
 <body>
 <h2>图片列表</h2>
 
-<p>
-    /start
-    /haslogin
-</p>
 
 <div>
-    <iframe src="/file/upload"></iframe>
+    <iframe style="height: 185px" src="/file/upload"></iframe>
 </div>
 
 <div id="app">
@@ -28,19 +23,20 @@
     <div v-for="item in list" style="border:1px solid red;margin-bottom:10px;">
         <!--{{item}}-->
         <p>{{item.name}}</p>
-        <p>{{item.serverPath}}</p>
-        <br />
+        <!--<p>{{item.serverPath}}</p>-->
         <p>{{item.weiboSyncState}}</p>
         <p style="display: none;">{{item.weiboSyncMsg}}</p>
         <p v-show="item.weiboId">
             {{"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
-            （or tva1.sinaimg.cn）
-            <a target="_blank" :href='"https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
+            （or tva1.sinaimg.cn / wx4）(mw690 / large)
+            <a target="_blank" :href='"https://tva1.sinaimg.cn/large/" + item.weiboId + ".jpg"'>go</a>
         </p>
         <p v-show="item.weiboId">
             {{"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"}}
-            <a target="_blank" :href='"/weibo/pic?url=" + "https://wx4.sinaimg.cn/mw690/" + item.weiboId + ".jpg"'>go</a>
+            <a target="_blank" :href='"/weibo/pic?url=" + "https://wx4.sinaimg.cn/large/" + item.weiboId + ".jpg"'>go</a>
         </p>
+        <br />
+        <img :src='"https://tva1.sinaimg.cn/large/" + item.weiboId + ".jpg"' style="max-width: 400px;"/>
     </div>
 </div>
 

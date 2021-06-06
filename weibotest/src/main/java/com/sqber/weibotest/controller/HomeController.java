@@ -56,7 +56,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String index() {
-        return "/home/index";
+        return "home/index";
     }
 
 
@@ -81,6 +81,14 @@ public class HomeController {
         String loginMsg = checkLogin();
 
         return "chrome driver 初始化成功 " + loginMsg;
+    }
+
+    @ResponseBody
+    @GetMapping("/close")
+    public String close(){
+        driver.close();
+        driver.quit();
+        return "close ok";
     }
 
     private void loadCookie() throws Exception {
@@ -187,7 +195,7 @@ public class HomeController {
         return str;
     }
 
-    @Scheduled(fixedRate = 1000 * 2)
+    //@Scheduled(fixedRate = 1000 * 2)
     public void sync() throws Exception {
         //log.info("task1 run");
 //        for(int i=0; i< 10; i++){
