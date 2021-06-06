@@ -3,6 +3,7 @@ package com.sqber.weibotest.controller;
 import com.alibaba.fastjson.JSON;
 import com.sqber.weibotest.base.DateUtil;
 import com.sqber.weibotest.base.FileHelper;
+import com.sqber.weibotest.base.SiteMapUtil;
 import com.sqber.weibotest.config.ChromeDriverConf;
 import com.sqber.weibotest.config.FileUploadConfig;
 import com.sqber.weibotest.config.WeiboConf;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Set;
@@ -68,14 +70,21 @@ public class SiteMapController {
         String sql = "select * from Article where publishStatus = 1 and enable = 1";
         List<Article> list = sqliteHelper.simpleQuery(sql, null, Article.class);
 
+        SiteMapUtil siteMapUtil = new SiteMapUtil();
+        siteMapUtil.addSitemapUrl("http://www.sqber.com", "1.0", "", SiteMapUtil.DAILY);
+        siteMapUtil.addSitemapUrl("http://www.sqber.com/friendlylink", "0.9", "", SiteMapUtil.MONTHLY);
+
         for (Article article : list) {
-            System.out.println(article.getUrlTitle());
-            System.out.println(DateUtil.format(article.getUpdateTime()));
-            String val = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.format(article.getUpdateTime());
-            System.out.println(val);
+            //System.out.println(article.getUrlTitle());
+            //System.out.println(DateUtil.format(article.getUpdateTime()));
+            String updateTime = DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.format(article.getUpdateTime());
+            siteMapUtil.addSitemapUrl("http://www.sqber.com/articles/" + article.getUrlTitle() + ".html", "0.8", updateTime, SiteMapUtil.WEEKLY);
         }
 
-        return "weibo application";
+        String content = siteMapUtil.getSiteMapContent();
+        siteMapUtil.writeTxtFile(content, Paths.get(fileUploadConfig.getSitemapPath(), "sitemap.xml").toString(), false, false);
+
+        return "done";
     }
 
 }
